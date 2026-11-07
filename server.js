@@ -7,10 +7,10 @@ const PORT = process.env.PORT;
 
 // if statement to handle the error if the port variable is not defined in .env
 if (!PORT) {
-    throw new Error('PORT is not defined in the enviroment variables');
+    throw new Error('PORT is not defined in the environment variables');
 }
 
-//function that connects with the server and catches any potential error and exiting the DB if failed
+// connects to the database, starts the server, and stops the app if startup fails
 const startServer = async () => {
 
     try {
