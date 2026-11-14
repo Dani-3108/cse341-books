@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getBooksHandler, getBookByIdHandler } from './controllers/books.js';
-import { getAuthorsHandler } from './controllers/authors.js';
+import { getAuthorsHandler,getAuthorByIdHandler } from './controllers/authors.js';
 
 
 const router = Router();
@@ -152,5 +152,63 @@ router.get('/books/:id', getBookByIdHandler);
  *                   example: Internal server error
  */
 router.get('/authors', getAuthorsHandler);
+
+/**
+ * @openapi
+ * /authors/{id}:
+ *   get:
+ *     summary: Get one author by id
+ *     tags:
+ *       - Authors
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The custom id of the author
+ *         example: a1
+ *     responses:
+ *       200:
+ *         description: The matching author
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   example: 6aefa3f4f9701e3ee77a6920
+ *                 id:
+ *                   type: string
+ *                   example: a1
+ *                 name:
+ *                   type: string
+ *                   example: Frank Herbert
+ *                 birthYear:
+ *                   type: integer
+ *                   example: 1920
+ *       404:
+ *         description: No author has that id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Author not found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.get('/authors/:id', getAuthorByIdHandler);
 
 export default router;
