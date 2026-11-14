@@ -12,4 +12,10 @@ const getAuthorById = async (requestedId) => {
     return author;
 };
 
-export { getAllAuthors, getAuthorById };
+const createAuthor = async (author) => {
+    const database = getDb();
+    const result = await database.collection('authors').insertOne(author);
+    return result;
+};
+
+export { getAllAuthors, getAuthorById,createAuthor };

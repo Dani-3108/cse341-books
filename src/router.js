@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getBooksHandler, getBookByIdHandler } from './controllers/books.js';
-import { getAuthorsHandler,getAuthorByIdHandler } from './controllers/authors.js';
+import { getAuthorsHandler,getAuthorByIdHandler,createAuthorHandler } from './controllers/authors.js';
 
 
 const router = Router();
@@ -210,5 +210,84 @@ router.get('/authors', getAuthorsHandler);
  *                   example: Internal server error
  */
 router.get('/authors/:id', getAuthorByIdHandler);
+/**
+ * @openapi
+ * /authors:
+ *   post:
+ *     summary: Create a new author
+ *     tags:
+ *       - Authors
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id
+ *               - name
+ *               - birthYear
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 example: a4
+ *               name:
+ *                 type: string
+ *                 example: Ursula K. Le Guin
+ *               birthYear:
+ *                 type: integer
+ *                 example: 1929
+ *     responses:
+ *       201:
+ *         description: The author was created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   example: 6aefa3f4f9701e3ee77a6921
+ *                 id:
+ *                   type: string
+ *                   example: a4
+ *                 name:
+ *                   type: string
+ *                   example: Ursula K. Le Guin
+ *                 birthYear:
+ *                   type: integer
+ *                   example: 1929
+ *       400:
+ *         description: Missing field, wrong type, or empty body
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: name is required
+ *       409:
+ *         description: An author with that id already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Author id already exists
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.post('/authors', createAuthorHandler);
 
 export default router;
