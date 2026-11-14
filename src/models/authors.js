@@ -18,4 +18,29 @@ const createAuthor = async (author) => {
     return result;
 };
 
-export { getAllAuthors, getAuthorById,createAuthor };
+const updateAuthor = async (requestedId, authorData) => {
+    const database = getDb();
+    const result = await database.collection('authors').updateOne({ id: requestedId }, { $set: authorData });
+    return result;
+};
+
+const deleteAuthor = async (requestedId) => {
+    const database = getDb();
+    const result = await database.collection('authors').deleteOne({ id: requestedId });
+    return result;
+};
+
+const authorHasBooks = async (authorId) => {
+    const database = getDb();
+    const book = await database.collection('books').findOne({ authorId });
+    return book !== null;
+};
+
+export {
+    getAllAuthors,
+    getAuthorById,
+    createAuthor,
+    updateAuthor,
+    deleteAuthor,
+    authorHasBooks
+};

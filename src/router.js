@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { getBooksHandler, getBookByIdHandler } from './controllers/books.js';
-import { getAuthorsHandler,getAuthorByIdHandler,createAuthorHandler } from './controllers/authors.js';
+import {
+    getAuthorsHandler,
+    getAuthorByIdHandler,
+    createAuthorHandler,
+    updateAuthorHandler,
+    deleteAuthorHandler
+} from './controllers/authors.js';
 
 
 const router = Router();
@@ -289,5 +295,137 @@ router.get('/authors/:id', getAuthorByIdHandler);
  *                   example: Internal server error
  */
 router.post('/authors', createAuthorHandler);
+
+/**
+ * @openapi
+ * /authors/{id}:
+ *   put:
+ *     summary: Update an author by id
+ *     tags:
+ *       - Authors
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The custom id of the author
+ *         example: a1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - birthYear
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Frank Herbert
+ *               birthYear:
+ *                 type: integer
+ *                 example: 1920
+ *     responses:
+ *       200:
+ *         description: The updated author
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: a1
+ *                 name:
+ *                   type: string
+ *                   example: Frank Herbert
+ *                 birthYear:
+ *                   type: integer
+ *                   example: 1920
+ *       400:
+ *         description: Missing field, wrong type, empty body, or id in the body
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: id cannot be changed in the body
+ *       404:
+ *         description: No author has that id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Author not found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.put('/authors/:id', updateAuthorHandler);
+
+/**
+ * @openapi
+ * /authors/{id}:
+ *   delete:
+ *     summary: Delete an author by id
+ *     tags:
+ *       - Authors
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The custom id of the author
+ *         example: a5
+ *     responses:
+ *       204:
+ *         description: The author was deleted (no body)
+ *       404:
+ *         description: No author has that id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Author not found
+ *       409:
+ *         description: The author still has books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Author still has books
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.delete('/authors/:id', deleteAuthorHandler);
 
 export default router;

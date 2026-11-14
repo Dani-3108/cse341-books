@@ -1,4 +1,11 @@
-import { getAllAuthors, getAuthorById,createAuthor } from "../models/authors.js";
+import {
+    getAllAuthors,
+    getAuthorById,
+    createAuthor,
+    updateAuthor,
+    authorHasBooks,
+    deleteAuthor
+} from "../models/authors.js";
 
 const getAuthorsHandler = async (req, res) => {
     try {
@@ -27,11 +34,11 @@ const getAuthorByIdHandler = async (req, res) => {
     }
 };
 
-const validateAuthorBody = (body) => {
+const validateAuthorBody = (body, isCreate) => {
     if (body === undefined || Object.keys(body).length === 0) {
         return 'Request body is required';
     }
-    if (body.id === undefined) {
+    if (isCreate && body.id === undefined) {
         return 'id is required';
     }
     if (body.name === undefined) {
@@ -40,7 +47,7 @@ const validateAuthorBody = (body) => {
     if (body.birthYear === undefined) {
         return 'birthYear is required';
     }
-    if (typeof body.id !== 'string' || body.id.trim() === '') {
+    if (isCreate && (typeof body.id !== 'string' || body.id.trim() === '')) {
         return 'id must be a non-empty string';
     }
     if (typeof body.name !== 'string' || body.name.trim() === '') {
@@ -49,12 +56,15 @@ const validateAuthorBody = (body) => {
     if (!Number.isInteger(body.birthYear)) {
         return 'birthYear must be an integer';
     }
+    if (!isCreate && body.id !== undefined) {
+        return 'id cannot be changed in the body';
+    }
     return null;
 };
 
 const createAuthorHandler = async (req, res) => {
     try {
-        const validationMessage = validateAuthorBody(req.body);
+        const validationMessage = validateAuthorBody(req.body, true);
         if (validationMessage !== null) {
             return res.status(400).json({ message: validationMessage });
         }
@@ -79,4 +89,59 @@ const createAuthorHandler = async (req, res) => {
     }
 };
 
-export { getAuthorsHandler,getAuthorByIdHandler,createAuthorHandler };
+const updateAuthorHandler = async (req, res) => {
+    try {
+        const requestedId = req.params.id;
+        const validationMessage = validateAuthorBody(req.body, false);
+        if (validationMessage !== null) {
+            return res.status(400).json({ message: validationMessage });
+        }
+
+        const authorData = {
+            name: req.body.name,
+            birthYear: req.body.birthYear
+        };
+        const result = await updateAuthor(requestedId, authorData);
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ message: 'Author not found' });
+        }
+
+        return res.status(200).json({ id: requestedId, ...authorData });
+    }
+    catch (error) {
+        console.error('Failed to update author', error.message);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+const deleteAuthorHandler = async (req, res) => {
+    try {
+        const requestedId = req.params.id;
+
+        const hasBooks = await authorHasBooks(requestedId);
+        if (hasBooks) {
+            return res.status(409).json({ message: 'Author still has books' });
+        }
+
+        const result = await deleteAuthor(requestedId);
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Author not found' });
+        }
+
+        return res.status(202).send();
+    }
+    catch (error) {
+        console.error('Failed to delete author', error.message);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+export {
+    getAuthorsHandler,
+    getAuthorByIdHandler,
+    createAuthorHandler,
+    updateAuthorHandler,
+    deleteAuthorHandler
+};
