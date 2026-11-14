@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { getBooksHandler, getBookByIdHandler } from './controllers/books.js';
+import { getAuthorsHandler } from './controllers/authors.js';
+
 
 const router = Router();
 
@@ -108,5 +110,47 @@ router.get('/books', getBooksHandler);
  *                   example: Internal server error
  */
 router.get('/books/:id', getBookByIdHandler);
+
+/**
+ * @openapi
+ * /authors:
+ *   get:
+ *     summary: Get all authors
+ *     tags:
+ *       - Authors
+ *     responses:
+ *       200:
+ *         description: A list of all authors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: 6aefa3f4f9701e3ee77a6920
+ *                   id:
+ *                     type: string
+ *                     example: a1
+ *                   name:
+ *                     type: string
+ *                     example: Frank Herbert
+ *                   birthYear:
+ *                     type: integer
+ *                     example: 1920
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.get('/authors', getAuthorsHandler);
 
 export default router;
