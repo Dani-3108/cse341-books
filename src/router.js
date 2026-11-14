@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { getBooksHandler, getBookByIdHandler } from './controllers/books.js';
+import {
+    getBooksHandler,
+    getBookByIdHandler,
+    createBookHandler,
+    updateBookHandler,
+    deleteBookHandler
+}
+from './controllers/books.js';
 import {
     getAuthorsHandler,
     getAuthorByIdHandler,
@@ -34,9 +41,9 @@ const router = Router();
  *                   id:
  *                     type: string
  *                     example: b1
- *                   author:
+ *                   authorId:
  *                     type: string
- *                     example: Maya Rivera
+ *                     example: a1
  *                   title:
  *                     type: string
  *                     example: Patterns of Light
@@ -85,9 +92,9 @@ router.get('/books', getBooksHandler);
  *                 id:
  *                   type: string
  *                   example: b1
- *                 author:
+ *                 authorId:
  *                   type: string
- *                   example: Maya Rivera
+ *                   example: a1
  *                 title:
  *                   type: string
  *                   example: Patterns of Light
@@ -427,5 +434,221 @@ router.put('/authors/:id', updateAuthorHandler);
  *                   example: Internal server error
  */
 router.delete('/authors/:id', deleteAuthorHandler);
+
+/**
+ * @openapi
+ * /books:
+ *   post:
+ *     summary: Create a new book
+ *     tags:
+ *       - Books
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id
+ *               - authorId
+ *               - title
+ *               - publicationDate
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 example: b5
+ *               authorId:
+ *                 type: string
+ *                 example: a1
+ *               title:
+ *                 type: string
+ *                 example: Children of Dune
+ *               publicationDate:
+ *                 type: string
+ *                 example: "1976-04-21"
+ *     responses:
+ *       201:
+ *         description: The book was created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   example: 6aefa3f4f9701e3ee77a6930
+ *                 id:
+ *                   type: string
+ *                   example: b5
+ *                 authorId:
+ *                   type: string
+ *                   example: a1
+ *                 title:
+ *                   type: string
+ *                   example: Children of Dune
+ *                 publicationDate:
+ *                   type: string
+ *                   example: "1976-04-21"
+ *       400:
+ *         description: Missing field, wrong type, empty body, or authorId does not match an existing author
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: authorId does not match an existing author
+ *       409:
+ *         description: A book with that id already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Book id already exists
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.post('/books', createBookHandler);
+
+/**
+ * @openapi
+ * /books/{id}:
+ *   put:
+ *     summary: Update a book by id
+ *     tags:
+ *       - Books
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The custom id of the book
+ *         example: b1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - authorId
+ *               - title
+ *               - publicationDate
+ *             properties:
+ *               authorId:
+ *                 type: string
+ *                 example: a1
+ *               title:
+ *                 type: string
+ *                 example: Dune
+ *               publicationDate:
+ *                 type: string
+ *                 example: "1965-08-01"
+ *     responses:
+ *       200:
+ *         description: The updated book
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: b1
+ *                 authorId:
+ *                   type: string
+ *                   example: a1
+ *                 title:
+ *                   type: string
+ *                   example: Dune
+ *                 publicationDate:
+ *                   type: string
+ *                   example: "1965-08-01"
+ *       400:
+ *         description: Missing field, wrong type, empty body, id in the body, or authorId does not match an existing author
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: id cannot be changed in the body
+ *       404:
+ *         description: No book has that id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Book not found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.put('/books/:id', updateBookHandler);
+
+/**
+ * @openapi
+ * /books/{id}:
+ *   delete:
+ *     summary: Delete a book by id
+ *     tags:
+ *       - Books
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The custom id of the book
+ *         example: b5
+ *     responses:
+ *       204:
+ *         description: The book was deleted (no body)
+ *       404:
+ *         description: No book has that id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Book not found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.delete('/books/:id', deleteBookHandler);
 
 export default router;
